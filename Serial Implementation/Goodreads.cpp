@@ -91,9 +91,12 @@ void count_ratings(Reviews reviews, _Books& books, string genre)
 	for (int i = 0; i < reviews.size(); ++i)
 	{
 		Book_id book_id = reviews[i]->get_book_id();
-		if (books[book_id]->has_genre(genre))
+		if (books[book_id]->has_genre(genre)){
 			books[book_id]->update_rating(reviews[i]->get_rating(), 
 				reviews[i]->get_number_of_likes());
+
+			
+}
 	}
 }
 
@@ -101,10 +104,11 @@ void find_best_book(_Books& books, string genre)
 {
 	Book* best;
 	float max_rating = 0;
-	for (map<Book_id, Book*>::iterator it = books.begin(); 
+	for (_Books::iterator it = books.begin(); 
 		it != books.end(); ++it)
 	{
 		Book* book = it->second;
+		
 		if (book->has_genre(genre))
 		{
     	 	book->calulate_average_rating();
@@ -116,5 +120,5 @@ void find_best_book(_Books& books, string genre)
     	 }
 	}
 
-	cout << best;
+	cout << *best;
 }
