@@ -19,9 +19,9 @@
 #define GENRES "Genres"
 #define NUMBER_OF_PAGES "Number of Pages"
 #define AUTHOR "Author"
-#define AVERAGE_RATING "Averager Rating"
+#define AVERAGE_RATING "Average Rating"
 #define PRECISION 2
-#define RATING_COEFFICIENT 1/10
+#define RATING_RATIO 0.1
 
 //Type Defines
 
@@ -51,7 +51,7 @@ private:
 	int pages; 
 	float author_average_rating;
 	float average_rating; 
-	int number_of_reviews;
+	int total_number_of_likes;
 
 	friend ostream& operator<<(ostream&, const Book&);
 };
