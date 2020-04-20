@@ -12,7 +12,7 @@ int main(int argc, char const *argv[])
 	count_ratings(reviews, books, genre);
 	find_best_book(books, genre);
 
-	return 0;
+	return ZERO;
 }
 
 void extract_new_book_info(_Books& books, string line)
@@ -42,8 +42,8 @@ Review* get_new_review_info(string line)
 		info.push_back(data);
 	}
 
-	Review* review = new Review(atoi(info[BOOK_ID].c_str()), atoi(info[RATING].c_str()), 
-		atoi(info[NUMBER_OF_LIKES].c_str()));
+	Review* review = new Review(atoi(info[BOOK_ID].c_str()), 
+		atoi(info[RATING].c_str()), atoi(info[NUMBER_OF_LIKES].c_str()));
 
 	return review;
 }
@@ -74,36 +74,22 @@ void read_csv(Reviews& reviews, string filename)
 	file.close();
 }
 
-/*int find_book_index_by_id(Books books, Book_id id)
-{
-    for (int i = 0; i < books.size(); i++)
-    {
-        if (books[i]->get_id() == id)
-        {
-            return i;
-        }
-    }
-    return BOOK_NOT_FOUND;
-}*/
-
 void count_ratings(Reviews reviews, _Books& books, string genre)
 {
-	for (int i = 0; i < reviews.size(); ++i)
+	for (int i = ZERO; i < reviews.size(); ++i)
 	{
 		Book_id book_id = reviews[i]->get_book_id();
-		if (books[book_id]->has_genre(genre)){
+
+		if (books[book_id]->has_genre(genre))
 			books[book_id]->update_rating(reviews[i]->get_rating(), 
 				reviews[i]->get_number_of_likes());
-
-			
-}
 	}
 }
 
 void find_best_book(_Books& books, string genre)
 {
 	Book* best;
-	float max_rating = 0;
+	double max_rating = ZERO;
 	for (_Books::iterator it = books.begin(); 
 		it != books.end(); ++it)
 	{
