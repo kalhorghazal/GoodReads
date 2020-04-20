@@ -9,10 +9,10 @@
 #include <map>
 
 #define NEW_LINE '\n'
+#define ZERO 0
+#define GENRE 1
 #define BOOKS_FILE "books.csv"
 #define REVIEWS_FILE "reviews.csv"
-#define GENRE 1
-#define BOOK_NOT_FOUND -1
 
 using namespace std;
 
@@ -39,11 +39,9 @@ enum Review_feature
 	NUMBER_OF_LIKES
 };
 
-//Book* get_new_book_info(string line);
 void get_new_book_info(_Books& books, string line);
 Review* get_new_review_info(string line);
 void read_csv(_Books& books, string filename);
 void read_csv(Reviews& reviews, string filename);
 void count_ratings(Reviews reviews, _Books& books, string genre);
 void find_best_book(_Books& books, string genre);
-//int find_book_index_by_id(Books books, Book_id id);
