@@ -11,21 +11,24 @@ Book::Book(int _id, string _title, string _genre_1, string _genre_2,
 	author_name = _author_name; 
 	author_average_rating = _author_average_rating;
 	average_rating = 0;
-	number_of_reviews = 0;
+	total_number_of_likes = 0;
 }
 
 void Book::update_rating(int rating, int number_of_likes)
 {
 	average_rating += (rating * number_of_likes);
-	number_of_reviews ++;
+	total_number_of_likes += number_of_likes;
 }
 
 void Book::calulate_average_rating()
 {
-	if (number_of_reviews != ZERO)
-		average_rating /= number_of_reviews;
+	if (total_number_of_likes != ZERO)
+		average_rating /= total_number_of_likes;
+	else
+		average_rating = 0;
+	
 	average_rating += author_average_rating;
-	average_rating *= RATING_COEFFICIENT;
+	average_rating *= RATING_RATIO;
 }
 
 bool Book::has_genre(string genre)
