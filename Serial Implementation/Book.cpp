@@ -1,25 +1,50 @@
 #include "Book.h"
 
 Book::Book(int _id, string _title, string _genre_1, string _genre_2, 
-		string _author_name, int _pages, float _author_average_rating)
+		int _pages, string _author_name, float _author_average_rating)
 {
 	id = _id; 
 	title = _title; 
 	genre_1 = _genre_1;  
 	genre_2 = _genre_2;
-	author_name = _author_name; 
 	pages = _pages; 
+	author_name = _author_name; 
 	author_average_rating = _author_average_rating;
+	average_rating = 0;
+	number_of_reviews = 0;
+}
+
+void Book::update_rating(int rating, int number_of_likes)
+{
+	average_rating += (rating * number_of_likes);
+	number_of_reviews ++;
+}
+
+void Book::calulate_average_rating()
+{
+	if (number_of_reviews != ZERO)
+		average_rating /= number_of_reviews;
+	average_rating += author_average_rating;
+	average_rating *= RATING_COEFFICIENT;
+}
+
+bool Book::has_genre(string genre)
+{
+	if (genre == genre_1 || genre == genre_2)
+		return TRUE;
+	return FALSE;
 }
 
 ostream& operator<<(ostream& out, const Book& book)
 {
-    out << ID << COLON << SPACE << book.get_id() << NEWLINE;
-    out << TITLE << COLON << SPACE << book.get_title() << NEWLINE;
+    out << "ID" << COLON << SPACE << book.get_id() << NEW_LINE;
+    out << "TITLE" << COLON << SPACE << book.get_title() << NEW_LINE;
     out << GENRES << COLON << SPACE << book.get_genre_1() << COMMA 
-    	<< SPACE << book.get_genre_2() << NEWLINE;
-    out << NUMBER_OF_PAGES << COLON << SPACE << book.get_pages() << NEWLINE;
-    out << AUTHOR << COLON << SPACE << book.get_author_name() << NEWLINE;
+    	<< SPACE << book.get_genre_2() << NEW_LINE;
+    out << NUMBER_OF_PAGES << COLON << SPACE << book.get_pages() << NEW_LINE;
+    out << AUTHOR << COLON << SPACE << book.get_author_name() << NEW_LINE;
+    out << AVERAGE_RATING << COLON << SPACE << setprecision(PRECISION) << 
+			fixed << book.get_average_rating() << NEW_LINE;
         
     return out;
 }
