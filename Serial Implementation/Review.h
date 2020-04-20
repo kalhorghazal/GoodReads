@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 
-#define ZERO 0
-#define ONE 1
 #define SPACE ' '
+#define ONE 1
+#define ZERO 0
 
-//Type Defines
+typedef int Book_id;
 
 using namespace std;
 
@@ -17,11 +17,11 @@ class Review
 {
 public:
 	Review(int _book_id, int _rating, int _number_of_likes);
-	int get_book_id() const { return book_id; }
+	Book_id get_book_id() const { return book_id; }
     int get_rating() const { return rating; }
     int get_number_of_likes() const { return number_of_likes; }
 private:
-	int book_id; 
+	Book_id book_id; 
 	int rating;
 	int number_of_likes;
 };
