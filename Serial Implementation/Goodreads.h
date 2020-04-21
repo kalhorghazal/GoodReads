@@ -17,9 +17,8 @@
 using namespace std;
 
 typedef int Book_id;
-typedef std::map<Book_id, Book*> _Books;
-typedef vector<Book*> Books;
 typedef vector<Review*> Reviews;
+typedef std::map<Book_id, Book*> _Books;
 
 enum Book_feature
 {
