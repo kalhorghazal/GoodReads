@@ -28,8 +28,8 @@ int main(int argc, char const *argv[])
 
 	count_ratings(reviews, books, genre);
 	find_best_book(books, genre);
+	
 	pthread_exit(NULL);
-	return ZERO;
 }
 
 void extract_new_book_info(Books& books, string line)
@@ -140,15 +140,15 @@ void* read_books(void* arg)
 	long index = (long)arg;
 	string filename = BOOKS + to_string(index) + SUFFIX;
 
-	Books myBooks;
-	read_csv(myBooks, filename);
+	Books my_books;
+	read_csv(my_books, filename);
 
 	pthread_mutex_lock (&mutex_read_book);
 
 	if (books.size() == ZERO)
-		books = myBooks;
+		books = my_books;
 	else
-		books.insert(myBooks.begin(), myBooks.end());
+		books.insert(my_books.begin(), my_books.end());
 
 	pthread_mutex_unlock (&mutex_read_book);
 
