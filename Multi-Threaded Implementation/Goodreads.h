@@ -49,6 +49,7 @@ pthread_t book_threads[NUMBER_OF_BOOK_THREADS];
 pthread_t review_threads[NUMBER_OF_REVIEW_THREADS];
 pthread_mutex_t mutex_read_book;
 pthread_mutex_t mutex_read_review;
+pthread_mutex_t mutex_count_rating;
 
 Review* get_new_review_info(string line);
 void get_new_book_info(Books& books, string line);
