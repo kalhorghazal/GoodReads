@@ -13,22 +13,17 @@
 #define NEW_LINE '\n'
 #define ZERO 0
 #define GENRE 1
-#define NUMBER_OF_THREADS 4
-#define BOOKS_FILE "books.csv"
-#define REVIEWS_FILE "reviews.csv"
+#define NUMBER_OF_BOOK_THREADS 4
+#define NUMBER_OF_REVIEW_THREADS 6
+#define SUFFIX ".csv"
+#define BOOKS "Assets/books_"
+#define REVIEWS "Assets/reviews_"
 
 using namespace std;
 
 typedef int Book_id;
-typedef std::map<Book_id, Book*> _Books;
-typedef vector<Book*> Books;
+typedef map<Book_id, Book*> Books;
 typedef vector<Review*> Reviews;
-
-typedef struct 
-{
-	int offset;
-	int len;
-} Thread_data;
 
 enum Book_feature
 {
@@ -48,20 +43,18 @@ enum Review_feature
 	NUMBER_OF_LIKES
 };
 
-pthread_t threads[NUMBER_OF_THREADS];
+Books books;
+Reviews reviews;
+pthread_t book_threads[NUMBER_OF_BOOK_THREADS];
+pthread_t review_threads[NUMBER_OF_REVIEW_THREADS];
 pthread_mutex_t mutex_read_book;
 pthread_mutex_t mutex_read_review;
-_Books books;
-Reviews reviews;
-int number_of_book_lines;
-int number_of_review_lines;
 
-void get_new_book_info(_Books& books, string line);
 Review* get_new_review_info(string line);
-void read_csv(_Books& books, string filename);
+void get_new_book_info(Books& books, string line);
+void read_csv(Books& books, string filename);
 void read_csv(Reviews& reviews, string filename);
-void count_ratings(Reviews reviews, _Books& books, string genre);
-void find_best_book(_Books& books, string genre);
-int get_number_of_lines(string filename);
-void* read_books(void* args);
-void* read_reviews(void* args);
+void count_ratings(Reviews reviews, Books& books, string genre);
+void find_best_book(Books& books, string genre);
+void* read_books(void* arg);
+void* read_reviews(void* arg);
