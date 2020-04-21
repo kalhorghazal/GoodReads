@@ -3,7 +3,7 @@
 int main(int argc, char const *argv[])
 {
 	string genre = argv[GENRE];
-	_Books books;
+	Books books;
 	Reviews reviews;
 
 	read_csv(books, BOOKS_FILE);
@@ -15,7 +15,7 @@ int main(int argc, char const *argv[])
 	return ZERO;
 }
 
-void extract_new_book_info(_Books& books, string line)
+void extract_new_book_info(Books& books, string line)
 {
 	istringstream templine(line);
 	string data;
@@ -48,7 +48,7 @@ Review* get_new_review_info(string line)
 	return review;
 }
 
-void read_csv(_Books& books, string filename)
+void read_csv(Books& books, string filename)
 {
 	ifstream file;
 	file.open(filename);
@@ -74,7 +74,7 @@ void read_csv(Reviews& reviews, string filename)
 	file.close();
 }
 
-void count_ratings(Reviews reviews, _Books& books, string genre)
+void count_ratings(Reviews reviews, Books& books, string genre)
 {
 	for (int i = ZERO; i < reviews.size(); ++i)
 	{
@@ -86,11 +86,11 @@ void count_ratings(Reviews reviews, _Books& books, string genre)
 	}
 }
 
-void find_best_book(_Books& books, string genre)
+void find_best_book(Books& books, string genre)
 {
 	Book* best;
 	double max_rating = ZERO;
-	for (_Books::iterator it = books.begin(); 
+	for (Books::iterator it = books.begin(); 
 		it != books.end(); ++it)
 	{
 		Book* book = it->second;
