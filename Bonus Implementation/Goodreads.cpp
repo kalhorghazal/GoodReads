@@ -1,224 +1,66 @@
-#include "Goodreads.h"
+#include "Book.h"
+#include "Review.h"
 
-int main(int argc, char const *argv[])
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+#include <pthread.h>
+#include <map>
+
+#define NEW_LINE '\n'
+#define ZERO 0
+#define GENRE 1
+#define NUMBER_OF_BOOK_THREADS 4
+#define NUMBER_OF_REVIEW_THREADS 6
+#define BOOKS_FILE "books.csv"
+#define REVIEWS_FILE "reviews.csv"
+
+using namespace std;
+
+typedef int Book_id;
+typedef std::map<Book_id, Book*> _Books;
+typedef vector<Book*> Books;
+typedef vector<Review*> Reviews;
+
+enum Book_feature
 {
-	string genre = argv[GENRE];
+	ID,
+	TITLE,
+	GENRE_1,
+	GENRE_2, 
+	PAGES,
+	AUTHOR_NAME,
+	AUTHOR_AVERAGE_RATING
+};
 
-	int books_length = get_file_length(BOOKS_FILE);
-	int reviews_length = get_file_length(REVIEWS_FILE);
-
-	void *status;
-
-	pthread_mutex_init(&mutex_read_book, NULL);
-
-	for(long i = ZERO; i < NUMBER_OF_BOOK_THREADS; i++)
-	{
-		Read_data* read_data = new Read_data();
-		read_data->start = i*books_length/NUMBER_OF_BOOK_THREADS;
-		read_data->length = books_length/NUMBER_OF_BOOK_THREADS;
-
-		if (i == (NUMBER_OF_BOOK_THREADS-1))
-			read_data->length += books_length%NUMBER_OF_BOOK_THREADS;
-
-		pthread_create(&book_threads[i], NULL, read_books, (void*)read_data);
-	}
-
-	for(long i = ZERO; i < NUMBER_OF_BOOK_THREADS; i++)
-		pthread_join(book_threads[i], &status);
-
-	pthread_mutex_destroy(&mutex_read_book);
-
-
-
-	pthread_mutex_init(&mutex_read_review, NULL);
-
-	for(long i = ZERO; i < NUMBER_OF_REVIEW_THREADS; i++)
-	{
-		Read_data* read_data = new Read_data();
-		read_data->start = i*reviews_length/NUMBER_OF_REVIEW_THREADS;
-		read_data->length = reviews_length/NUMBER_OF_REVIEW_THREADS;
-
-		if (i == (NUMBER_OF_BOOK_THREADS-1))
-			read_data->length += reviews_length%NUMBER_OF_REVIEW_THREADS;
-
-		pthread_create(&review_threads[i], NULL, read_reviews, (void*)read_data);
-	}
-
-	for(long i = ZERO; i < NUMBER_OF_REVIEW_THREADS; i++) 
-		pthread_join(review_threads[i], &status);
-
-	pthread_mutex_destroy(&mutex_read_review);
-
-
-	count_ratings(reviews, books, genre);
-	find_best_book(books, genre);
-
-	pthread_exit(NULL);
-}
-
-void extract_new_book_info(_Books& books, string line)
+enum Review_feature
 {
-	istringstream templine(line);
-	string data;
-	vector<string> info;
+	BOOK_ID,
+	RATING,
+	NUMBER_OF_LIKES
+};
 
-	while (getline(templine, data, COMMA)){
-		info.push_back(data);
-	}
-
-	Book *book = new Book(atoi(info[ID].c_str()), info[TITLE], info[GENRE_1], 
-		info[GENRE_2], atoi(info[PAGES].c_str()), info[AUTHOR_NAME], 
-		atof(info[AUTHOR_AVERAGE_RATING].c_str()));
-
-	books[atoi(info[ID].c_str())] = book;
-
-}
-
-Review* get_new_review_info(string line)
+typedef struct 
 {
-	istringstream templine(line);
-	string data;
-	vector<string> info;
+	int start; 
+	int length; 
+} Read_data;
 
-	while (getline(templine, data, COMMA)){
-		info.push_back(data);
-	}
+_Books books;
+Reviews reviews;
+pthread_t book_threads[NUMBER_OF_BOOK_THREADS];
+pthread_t review_threads[NUMBER_OF_REVIEW_THREADS];
+pthread_mutex_t mutex_read_book;
+pthread_mutex_t mutex_read_review;
 
-	Review* review = new Review(atoi(info[BOOK_ID].c_str()), 
-		atoi(info[RATING].c_str()), atoi(info[NUMBER_OF_LIKES].c_str()));
-
-	return review;
-}
-
-void read_csv(_Books& books, string filename)
-{
-	ifstream file;
-	file.open(filename);
-	string line;
-	getline(file, line, NEW_LINE);
-
-	while (getline(file, line, NEW_LINE))
-		extract_new_book_info(books, line);
-
-	file.close();
-}
-
-void read_csv(Reviews& reviews, string filename)
-{
-	ifstream file;
-	file.open(filename);
-	string line;
-	getline(file, line, NEW_LINE);
-
-	while (getline(file, line, NEW_LINE))
-		reviews.push_back(get_new_review_info(line));
-
-	file.close();
-}
-
-void count_ratings(Reviews reviews, _Books& books, string genre)
-{
-	for (int i = ZERO; i < reviews.size(); ++i)
-	{
-		Book_id book_id = reviews[i]->get_book_id();
-
-		if (books[book_id]->has_genre(genre))
-			books[book_id]->update_rating(reviews[i]->get_rating(), 
-				reviews[i]->get_number_of_likes());
-	}
-}
-
-void find_best_book(_Books& books, string genre)
-{
-	Book* best;
-	double max_rating = ZERO;
-	for (_Books::iterator it = books.begin(); 
-		it != books.end(); ++it)
-	{
-		Book* book = it->second;
-		
-		if (book->has_genre(genre))
-		{
-    	 	book->calulate_average_rating();
-    	 	if (book->get_average_rating() > max_rating)
-    	 	{
-    	 		best = book;
-    	 		max_rating = book->get_average_rating();
-    	 	}
-    	 }
-	}
-
-	cout << *best;
-}
-
-int get_file_length(string filename)
-{
-	ifstream file(filename);
-	file.seekg(0, file.end);
-	int length = file.tellg();
-
-	return length;
-
-}
-
-void* read_books(void* arg)
-{
-	Read_data* read_data = (Read_data*)arg;
-
-	fstream file(BOOKS_FILE);
-	file.seekg(read_data->start, ios::beg); 
-
-	_Books my_books;
-
-	string line;
-	getline(file, line, NEW_LINE);
-
-	while (getline(file, line, NEW_LINE))
-	{
-		extract_new_book_info(my_books, line);
-		if (file.tellg() > (read_data->start + read_data->length))
-			break;
-	}
-
-	pthread_mutex_lock (&mutex_read_book);
-
-	if (books.size() == ZERO)
-		books = my_books;
-	else
-		books.insert(my_books.begin(), my_books.end());
-
-	pthread_mutex_unlock (&mutex_read_book);
-
-	pthread_exit((void*)ZERO);
-}
-
-void* read_reviews(void* arg)
-{
-	Read_data* read_data = (Read_data*)arg;
-
-	fstream file(REVIEWS_FILE);
-	file.seekg(read_data->start, ios::beg); 
-
-	Reviews my_reviews;
-
-	string line;
-	getline(file, line, NEW_LINE);
-
-	while (getline(file, line, NEW_LINE))
-	{
-		my_reviews.push_back(get_new_review_info(line));
-		if (file.tellg() > (read_data->start + read_data->length))
-			break;
-	}
-
-	pthread_mutex_lock (&mutex_read_review);
-
-	if (reviews.size() == ZERO)
-		reviews = my_reviews;
-	else
-		reviews.insert(reviews.end(), my_reviews.begin(), my_reviews.end());
-
-	pthread_mutex_unlock (&mutex_read_review);
-
-	pthread_exit((void*)ZERO);
-}
+void get_new_book_info(_Books& books, string line);
+Review* get_new_review_info(string line);
+void read_csv(_Books& books, string filename);
+void read_csv(Reviews& reviews, string filename);
+void count_ratings(Reviews reviews, _Books& books, string genre);
+void find_best_book(_Books& books, string genre);
+int get_file_length(string filename);
+void* read_books(void* arg);
+void* read_reviews(void* arg);
