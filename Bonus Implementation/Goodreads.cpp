@@ -26,25 +26,32 @@ int main(int argc, char const *argv[])
 	for(long i = ZERO; i < NUMBER_OF_BOOK_THREADS; i++)
 		pthread_join(book_threads[i], &status);
 
-	/*pthread_mutex_destroy(&mutex_read_book);
+	pthread_mutex_destroy(&mutex_read_book);
+
+
 
 	pthread_mutex_init(&mutex_read_review, NULL);
 
 	for(long i = ZERO; i < NUMBER_OF_REVIEW_THREADS; i++)
-		pthread_create(&review_threads[i], NULL, read_reviews, (void*)i);
+	{
+		Read_data* read_data = new Read_data();
+		read_data->start = i*reviews_length/NUMBER_OF_REVIEW_THREADS;
+		read_data->length = reviews_length/NUMBER_OF_REVIEW_THREADS;
+
+		if (i == (NUMBER_OF_BOOK_THREADS-1))
+			read_data->length += reviews_length%NUMBER_OF_REVIEW_THREADS;
+
+		pthread_create(&review_threads[i], NULL, read_reviews, (void*)read_data);
+	}
 
 	for(long i = ZERO; i < NUMBER_OF_REVIEW_THREADS; i++) 
 		pthread_join(review_threads[i], &status);
 
-	pthread_mutex_destroy(&mutex_read_review);*/
+	pthread_mutex_destroy(&mutex_read_review);
 
-	//read_csv(books, BOOKS_FILE);
-	//read_csv(reviews, REVIEWS_FILE);
 
-	//count_ratings(reviews, books, genre);
-	//find_best_book(books, genre);
-
-	//cout << books_length << endl << reviews_length << endl;
+	count_ratings(reviews, books, genre);
+	find_best_book(books, genre);
 
 	pthread_exit(NULL);
 }
@@ -181,6 +188,37 @@ void* read_books(void* arg)
 		books.insert(my_books.begin(), my_books.end());
 
 	pthread_mutex_unlock (&mutex_read_book);
+
+	pthread_exit((void*)ZERO);
+}
+
+void* read_reviews(void* arg)
+{
+	Read_data* read_data = (Read_data*)arg;
+
+	fstream file(REVIEWS_FILE);
+	file.seekg(read_data->start, ios::beg); 
+
+	Reviews my_reviews;
+
+	string line;
+	getline(file, line, NEW_LINE);
+
+	while (getline(file, line, NEW_LINE))
+	{
+		my_reviews.push_back(get_new_review_info(line));
+		if (file.tellg() > (read_data->start + read_data->length))
+			break;
+	}
+
+	pthread_mutex_lock (&mutex_read_review);
+
+	if (reviews.size() == ZERO)
+		reviews = my_reviews;
+	else
+		reviews.insert(reviews.end(), my_reviews.begin(), my_reviews.end());
+
+	pthread_mutex_unlock (&mutex_read_review);
 
 	pthread_exit((void*)ZERO);
 }
