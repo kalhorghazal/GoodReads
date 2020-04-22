@@ -5,6 +5,8 @@ int main(int argc, char const *argv[])
 	string genre = argv[GENRE];
 
 	void *status;
+	
+	//..........Reading Books Using Multi-Threading..........\\
 
 	pthread_mutex_init(&mutex_read_book, NULL);
 
@@ -15,6 +17,8 @@ int main(int argc, char const *argv[])
 		pthread_join(book_threads[i], &status);
 
 	pthread_mutex_destroy(&mutex_read_book);
+	
+	//..........Reading Reviews Using Multi-Threading..........\\
 
 	pthread_mutex_init(&mutex_read_review, NULL);
 
@@ -25,6 +29,8 @@ int main(int argc, char const *argv[])
 		pthread_join(review_threads[i], &status);
 
 	pthread_mutex_destroy(&mutex_read_review);
+	
+	//..........Processing Datasets..........\\
 
 	count_ratings(reviews, books, genre);
 	find_best_book(books, genre);
