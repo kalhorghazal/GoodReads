@@ -4,8 +4,8 @@ int main(int argc, char const *argv[])
 {
 	string genre = argv[GENRE];
 
-	call_review_readers();
 	call_book_readers();
+	call_review_readers();
 
 	count_ratings(reviews, books, genre);
 	find_best_book(books, genre);
@@ -13,7 +13,7 @@ int main(int argc, char const *argv[])
 	pthread_exit(NULL);
 }
 
-void call_review_readers()
+void call_book_readers()
 {
 	void *status;
 
@@ -28,7 +28,7 @@ void call_review_readers()
 	pthread_mutex_destroy(&mutex_read_book);
 }
 
-void call_book_readers()
+void call_review_readers()
 {
 	void *status;
 
