@@ -4,9 +4,18 @@ int main(int argc, char const *argv[])
 {
 	string genre = argv[GENRE];
 
-	void *status;
+	call_review_readers();
+	call_book_readers();
+
+	count_ratings(reviews, books, genre);
+	find_best_book(books, genre);
 	
-	//..........Reading Books Using Multi-Threading..........\\
+	pthread_exit(NULL);
+}
+
+void call_review_readers()
+{
+	void *status;
 
 	pthread_mutex_init(&mutex_read_book, NULL);
 
@@ -17,8 +26,11 @@ int main(int argc, char const *argv[])
 		pthread_join(book_threads[i], &status);
 
 	pthread_mutex_destroy(&mutex_read_book);
-	
-	//..........Reading Reviews Using Multi-Threading..........\\
+}
+
+void call_book_readers()
+{
+	void *status;
 
 	pthread_mutex_init(&mutex_read_review, NULL);
 
@@ -29,13 +41,6 @@ int main(int argc, char const *argv[])
 		pthread_join(review_threads[i], &status);
 
 	pthread_mutex_destroy(&mutex_read_review);
-	
-	//..........Processing Datasets..........\\
-
-	count_ratings(reviews, books, genre);
-	find_best_book(books, genre);
-	
-	pthread_exit(NULL);
 }
 
 void extract_new_book_info(Books& books, string line)
@@ -99,6 +104,7 @@ void read_csv(Reviews& reviews, string filename)
 
 void count_ratings(Reviews reviews, Books& books, string genre)
 {
+    #pragma omp parallel for 
 	for (int i = ZERO; i < reviews.size(); ++i)
 	{
 		Book_id book_id = reviews[i]->get_book_id();
@@ -113,6 +119,8 @@ void find_best_book(Books& books, string genre)
 {
 	Book* best;
 	double max_rating = ZERO;
+	
+	#pragma omp parallel for 
 	for (Books::iterator it = books.begin(); 
 		it != books.end(); ++it)
 	{
