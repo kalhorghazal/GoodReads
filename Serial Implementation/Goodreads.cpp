@@ -76,6 +76,7 @@ void read_csv(Reviews& reviews, string filename)
 
 void count_ratings(Reviews reviews, Books& books, string genre)
 {
+    #pragma omp parallel for 
 	for (int i = ZERO; i < reviews.size(); ++i)
 	{
 		Book_id book_id = reviews[i]->get_book_id();
@@ -90,6 +91,8 @@ void find_best_book(Books& books, string genre)
 {
 	Book* best;
 	double max_rating = ZERO;
+	
+	#pragma omp parallel for 
 	for (Books::iterator it = books.begin(); 
 		it != books.end(); ++it)
 	{
