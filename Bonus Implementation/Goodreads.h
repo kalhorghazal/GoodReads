@@ -1,28 +1,29 @@
 #include "Book.h"
 #include "Review.h"
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#include <map>
+#include <omp.h>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 #include <pthread.h>
-#include <map>
 
-#define NEW_LINE '\n'
 #define ONE 1
 #define ZERO 0
 #define GENRE 1
-#define NUMBER_OF_BOOK_THREADS 4
-#define NUMBER_OF_REVIEW_THREADS 6
+#define NEW_LINE '\n'
 #define BOOKS_FILE "books.csv"
 #define REVIEWS_FILE "reviews.csv"
+#define NUMBER_OF_BOOK_THREADS 4
+#define NUMBER_OF_REVIEW_THREADS 6
 
 using namespace std;
 
 typedef int Book_id;
-typedef map<Book_id, Book*> Books;
 typedef vector<Review*> Reviews;
+typedef map<Book_id, Book*> Books;
 
 enum Book_feature
 {
@@ -50,15 +51,17 @@ typedef struct
 
 Books books;
 Reviews reviews;
-pthread_t book_threads[NUMBER_OF_BOOK_THREADS];
-pthread_t review_threads[NUMBER_OF_REVIEW_THREADS];
 pthread_mutex_t mutex_read_book;
 pthread_mutex_t mutex_read_review;
+pthread_t book_threads[NUMBER_OF_BOOK_THREADS];
+pthread_t review_threads[NUMBER_OF_REVIEW_THREADS];
 
-Review* get_new_review_info(string line);
-void get_new_book_info(Books& books, string line);
-void count_ratings(Reviews reviews, Books& books, string genre);
-void find_best_book(Books& books, string genre);
-int get_file_length(string filename);
+void call_book_readers();
+void call_review_readers();
 void* read_books(void* arg);
 void* read_reviews(void* arg);
+int get_file_length(string filename);
+Review* get_new_review_info(string line);
+void find_best_book(Books& books, string genre);
+void get_new_book_info(Books& books, string line);
+void count_ratings(Reviews reviews, Books& books, string genre);
