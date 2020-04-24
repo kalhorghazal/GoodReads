@@ -1,16 +1,17 @@
 #include "Book.h"
 #include "Review.h"
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#include <map>
+#include <omp.h>
 #include <vector>
 #include <string>
-#include <map>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
-#define NEW_LINE '\n'
 #define ZERO 0
 #define GENRE 1
+#define NEW_LINE '\n'
 #define BOOKS_FILE "books.csv"
 #define REVIEWS_FILE "reviews.csv"
 
@@ -38,9 +39,9 @@ enum Review_feature
 	NUMBER_OF_LIKES
 };
 
-void get_new_book_info(Books& books, string line);
 Review* get_new_review_info(string line);
 void read_csv(Books& books, string filename);
-void read_csv(Reviews& reviews, string filename);
-void count_ratings(Reviews reviews, Books& books, string genre);
 void find_best_book(Books& books, string genre);
+void read_csv(Reviews& reviews, string filename);
+void get_new_book_info(Books& books, string line);
+void count_ratings(Reviews reviews, Books& books, string genre);
