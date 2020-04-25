@@ -18,8 +18,9 @@
 using namespace std;
 
 typedef int Book_id;
+typedef string Genre;
 typedef vector<Review*> Reviews;
-typedef std::map<Book_id, Book*> Books;
+typedef map<Book_id, Book*> Books;
 
 enum Book_feature
 {
@@ -39,9 +40,14 @@ enum Review_feature
 	NUMBER_OF_LIKES
 };
 
-Review* get_new_review_info(string line);
+Books books;
+Genre genre;
+Reviews reviews;
+
+bool contains_key(int key);
+void find_best_book(Books& books);
 void read_csv(Books& books, string filename);
-void find_best_book(Books& books, string genre);
 void read_csv(Reviews& reviews, string filename);
-void get_new_book_info(Books& books, string line);
-void count_ratings(Reviews reviews, Books& books, string genre);
+void count_ratings(Reviews reviews, Books& books);
+void extract_new_book_info(Books& books, string line);
+void extract_new_review_info(Reviews& reviews, string line);
