@@ -1,5 +1,5 @@
 COMPILER = g++
-COMPILER_FLAGS = --std=c++11
+COMPILER_FLAGS = -o3 --std=c++11
 all : Goodreads.out
 
 Goodreads.out: Goodreads.o Book.o Review.o
